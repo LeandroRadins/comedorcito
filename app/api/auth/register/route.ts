@@ -9,39 +9,42 @@ const hashPassword = async (password: string) => {
 };
 
 export async function POST(request: Request) {
-  const data = await request.json();
+  try {
+    const data = await request.json();
 
-  const userFound = await db.user.findFirst({
-    where: {
-      OR: [{ dni: data.dni }, { email: data.email }],
-    },
-  });
-
-  if (userFound) {
-
-    const { password: _, ...user } = userFound;
-
-    return NextResponse.json(
-      { user },
-      { status: 404, statusText: "El usuario ya existe..." }
-    );
-  } else {
-    const hashedPassword = await hashPassword(data.password);
-    const newUser = await db.user.create({
-      data: {
-        dni: data.dni,
-        name: data.name,
-        surname: data.surname,
-        email: data.email,
-        password: hashedPassword,
+    const userFound = await db.user.findFirst({
+      where: {
+        OR: [{ dni: data.dni }, { email: data.email }],
       },
     });
 
-    const { password: _, ...user } = newUser;
+    if (userFound) {
+      const { password: _, ...user } = userFound;
 
-    return NextResponse.json(
-      { user },
-      { status: 201, statusText: "Usuario creado correctamente" }
-    );
+      return NextResponse.json(
+        { user },
+        { status: 404, statusText: "El usuario ya existe..." }
+      );
+    } else {
+      const hashedPassword = await hashPassword(data.password);
+      const newUser = await db.user.create({
+        data: {
+          dni: data.dni,
+          name: data.name,
+          surname: data.surname,
+          email: data.email,
+          password: hashedPassword,
+        },
+      });
+
+      const { password: _, ...user } = newUser;
+
+      return NextResponse.json(
+        { user },
+        { status: 201, statusText: "Usuario creado correctamente" }
+      );
+    }
+  } catch (error) {
+    return NextResponse.json({ message: error }, { status: 500 });
   }
 }
