@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 interface FormFields {
@@ -21,7 +22,13 @@ const RegisterForm = () => {
       headers: { "Content-Type": "application/json" },
       method: "POST",
       body: JSON.stringify(data),
-    });
+    })
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((data) => {
+        console.log(data.errors);
+      });
   };
 
   return (

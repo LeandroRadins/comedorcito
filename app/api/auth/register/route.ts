@@ -17,21 +17,17 @@ export async function POST(request: Request) {
     },
   });
 
-  console.log(userFound);
-
   if (userFound) {
-    console.log("Este usuario ya existe...");
+
+    const { password: _, ...user } = userFound;
+
     return NextResponse.json(
-      {
-        message: "El usuario ya existe...",
-      },
-      {
-        status: 400,
-      }
+      { user },
+      { status: 404, statusText: "El usuario ya existe..." }
     );
   } else {
     const hashedPassword = await hashPassword(data.password);
-    await db.user.create({
+    const newUser = await db.user.create({
       data: {
         dni: data.dni,
         name: data.name,
@@ -40,7 +36,12 @@ export async function POST(request: Request) {
         password: hashedPassword,
       },
     });
-  }
 
-  return NextResponse.json({ message: "Usuario creado correctamente..." });
+    const { password: _, ...user } = newUser;
+
+    return NextResponse.json(
+      { user },
+      { status: 201, statusText: "Usuario creado correctamente" }
+    );
+  }
 }
