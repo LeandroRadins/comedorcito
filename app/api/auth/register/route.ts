@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import db from "@libs/db";
+import db from "@lib/db";
 import * as bcrypt from "bcryptjs";
 
 const hashPassword = async (password: string) => {
@@ -22,8 +22,11 @@ export async function POST(request: Request) {
       const { password: _, ...user } = userFound;
 
       return NextResponse.json(
-        { user },
-        { status: 404, statusText: "El usuario ya existe..." }
+        {
+          message:
+            "¡Ups! Parece que este usuario ya está registrado. Por favor, intenta iniciar sesión o utiliza otro nombre de usuario.",
+        },
+        { status: 406 }
       );
     } else {
       const hashedPassword = await hashPassword(data.password);

@@ -1,5 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 interface FormFields {
   name: string;
@@ -7,6 +9,7 @@ interface FormFields {
   dni: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 const RegisterForm = () => {
@@ -16,18 +19,48 @@ const RegisterForm = () => {
     formState: { errors },
   } = useForm<FormFields>();
 
+  const router = useRouter();
+
+  const { toast } = useToast();
+
   const onsubmit = async (data: FormFields) => {
+    if (data.password !== data.confirmPassword) {
+      toast({
+        title: "Error de Confirmación",
+        description:
+          "Las contraseñas no coinciden. Por favor, inténtalo de nuevo.",
+        variant: "warning",
+      });
+      return;
+    }
+
     const res = await fetch("/api/auth/register", {
       headers: { "Content-Type": "application/json" },
       method: "POST",
       body: JSON.stringify(data),
-    })
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((data) => {
-        console.log(data.errors);
+    });
+
+    if (res.ok) {
+      router.push("/auth/login");
+    } else {
+      const error = await res.json();
+      let errorMessage = "";
+      switch (res.status) {
+        case 500:
+          errorMessage = "Ocurrio un error en el servidor"
+          break;
+      
+        default:
+          errorMessage = error.message
+          break;
+      }
+      toast({
+        title: "Error inesperado",
+        description: errorMessage,
+        variant: "danger",
       });
+      
+    }
   };
 
   return (
@@ -58,7 +91,6 @@ const RegisterForm = () => {
                   id="name"
                   type="text"
                   {...register("name")}
-                  //autoComplete="name"
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
@@ -76,7 +108,6 @@ const RegisterForm = () => {
                   id="surname"
                   type="text"
                   {...register("surname")}
-                  //autoComplete="family-name" // Fix: Use "family-name" as the value for the autoComplete attribute
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
@@ -129,8 +160,27 @@ const RegisterForm = () => {
                 <input
                   id="password"
                   type="password"
-                  {...register("password")}
-                  required
+                  {...register("password", { required: true })}
+                  autoComplete="current-password"
+                  className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                />
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between">
+                <label
+                  htmlFor="password"
+                  className="block text-1xl font-medium leading-6 text-gray-900"
+                >
+                  Repetir Contraseña
+                </label>
+              </div>
+              <div className="mt-1">
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  {...register("confirmPassword", { required: true })}
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
               </div>
@@ -147,7 +197,7 @@ const RegisterForm = () => {
           </form>
 
           <p className="mt-10 text-center text-sm text-gray-500">
-            Ya tiene una cuenta?{" "}
+            ¿Ya tienes una cuenta?{" "}
             <a
               href="#"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
