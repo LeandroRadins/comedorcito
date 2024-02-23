@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 
+// TODO: armar los datos dinamicos para el manejo de datos desde front y back
+
 interface FormFields {
   name: string;
   surname: string;
@@ -43,23 +45,12 @@ const RegisterForm = () => {
     if (res.ok) {
       router.push("/auth/login");
     } else {
-      const error = await res.json();
-      let errorMessage = "";
-      switch (res.status) {
-        case 500:
-          errorMessage = "Ocurrio un error en el servidor"
-          break;
-      
-        default:
-          errorMessage = error.message
-          break;
-      }
+      const { message } = await res.json();
       toast({
         title: "Error inesperado",
-        description: errorMessage,
+        description: message,
         variant: "danger",
       });
-      
     }
   };
 
