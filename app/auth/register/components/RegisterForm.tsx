@@ -1,28 +1,24 @@
 "use client";
 import { useState } from "react";
-import { Form, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-import { FormHeader } from "./FormHeader";
+import { FormHeader } from "../../components/FormHeader";
 import { Label } from "../../../components/Label";
+import { registerSchema } from "@/schema";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 // TODO: armar los datos dinamicos para el manejo de datos desde front y back
-
-interface FormFields {
-  name: string;
-  surname: string;
-  dni: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
 
 const RegisterForm = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<FormFields>();
+  } = useForm<z.infer<typeof registerSchema>>({
+    resolver: zodResolver(registerSchema),
+  });
 
   const [confirmation, setConfirmation] = useState(false);
 
@@ -30,35 +26,35 @@ const RegisterForm = () => {
 
   const { toast } = useToast();
 
-  const onsubmit = async (data: FormFields) => {
-    if (data.password !== data.confirmPassword) {
-      setConfirmation(true);
-      return;
-    }
+  const validateData = (data: z.infer<typeof registerSchema>) => {
+    const isValid = registerSchema.safeParse(data);
+    return isValid.success;
+  };
 
-    const res = await fetch("/api/auth/register", {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-
-    if (res.ok) {
-      router.push("/auth/login");
-    } else {
-      const { message } = await res.json();
-      toast({
-        title: "Error inesperado",
-        description: message,
-        variant: "danger",
+  const onsubmit = async (data: z.infer<typeof registerSchema>) => {
+    if (validateData(data)) {
+      const res = await fetch("/api/auth/register", {
+        headers: { "Content-Type": "application/json" },
+        method: "POST",
+        body: JSON.stringify(data),
       });
+
+      if (res.ok) {
+        router.push("/auth/login");
+      } else {
+        const { message } = await res.json();
+        toast({
+          title: "Error inesperado",
+          description: message,
+          variant: "danger",
+        });
+      }
     }
-    setConfirmation(false);
   };
 
   return (
     <>
-      <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-28 lg:px-8">
-        
+      <div className="flex max-h-full flex-1 flex-col justify-center px-6 py-28 lg:px-8">
         <FormHeader title="Registrarse" />
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
@@ -70,20 +66,7 @@ const RegisterForm = () => {
                   id="name"
                   type="text"
                   placeholder=""
-                  {...register("name", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides tu nombre! ✍️",
-                    },
-                    minLength: {
-                      value: 2,
-                      message: "Nombre demasiado corto (min. 2 caracteres)",
-                    },
-                    maxLength: {
-                      value: 50,
-                      message: "Nombre demasiado largo (máx. 50 caracteres)",
-                    },
-                  })}
+                  {...register("name")}
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
                 {errors.name && (
@@ -98,20 +81,7 @@ const RegisterForm = () => {
                 <input
                   id="surname"
                   type="text"
-                  {...register("surname", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides tu apellido! ✍️",
-                    },
-                    minLength: {
-                      value: 2,
-                      message: "Apellido demasiado corto (min. 2 caracteres)",
-                    },
-                    maxLength: {
-                      value: 50,
-                      message: "Apellido demasiado largo (máx. 50 caracteres)",
-                    },
-                  })}
+                  {...register("surname")}
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
                 {errors.surname && (
@@ -126,17 +96,7 @@ const RegisterForm = () => {
                 <input
                   id="dni"
                   type="number"
-                  {...register("dni", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides tu DNI! ✍️",
-                    },
-                    pattern: {
-                      value: /^[\d]{1,3}?[\d]{3,3}?([\d]{3,3})?$/,
-                      message:
-                        "¡Uy! DNI no valido ⛔️ (5-9 dígitos sin puntos)",
-                    },
-                  })}
+                  {...register("dni")}
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
                 {errors.dni && (
@@ -151,16 +111,7 @@ const RegisterForm = () => {
                 <input
                   id="email"
                   type="email"
-                  {...register("email", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides tu correo electrónico! ✍️",
-                    },
-                    pattern: {
-                      value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                      message: "¡Epa! Correo no valido ⛔️. Revisa el formato",
-                    },
-                  })}
+                  {...register("email")}
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
                 {errors.email && (
@@ -175,22 +126,7 @@ const RegisterForm = () => {
                 <input
                   id="password"
                   type="password"
-                  {...register("password", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides ingresar una contraseña! ✍️",
-                    },
-                    minLength: {
-                      value: 8,
-                      message: "Contraseña demasiado corta (min. 8 caracteres)",
-                    },
-                    pattern: {
-                      value:
-                        /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
-                      message:
-                        "Contraseña insegura. Debe tener 8 caracteres, letras, números y símbolos.",
-                    },
-                  })}
+                  {...register("password")}
                   autoComplete="current-password"
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
@@ -209,22 +145,13 @@ const RegisterForm = () => {
                 <input
                   id="confirmPassword"
                   type="password"
-                  {...register("confirmPassword", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides confirmar tu contraseña! ✍️",
-                    },
-                  })}
+                  {...register("confirmPassword")}
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />
+
                 {errors.confirmPassword && (
                   <span className="text-red-600">
                     {errors.confirmPassword.message}
-                  </span>
-                )}
-                {confirmation && (
-                  <span className="text-red-600">
-                    Las contraseñas no coinciden
                   </span>
                 )}
               </div>

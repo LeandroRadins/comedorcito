@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import db from "@lib/db";
-import {Prisma} from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
+import { NextResponse } from "next/server";
 
 const hashPassword = async (password: string) => {
   const salt = await bcrypt.genSalt(10);
@@ -59,12 +59,12 @@ export async function POST(request: Request) {
     Validacion de datos
 
     */
+
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return NextResponse.json(
-        { message: "Ocurrio un error en la base de datos" , code: error.code },
+        { message: "Ocurrio un error en la base de datos", code: error.code },
         { status: 500 }
       );
     }
-    //return NextResponse.json({ message: error }, { status: 500 });
   }
 }
