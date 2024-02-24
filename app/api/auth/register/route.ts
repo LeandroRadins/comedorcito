@@ -23,7 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           message:
-            "¡Ups! Parece que este usuario ya está registrado. Por favor, intenta iniciar sesión o utiliza otro nombre de usuario.",
+            "¡Ups! Parece que este usuario ya está registrado. Por favor, intenta iniciar sesión o verifica tu correo  electronico o DNI.",
         },
         { status: 400 }
       );
