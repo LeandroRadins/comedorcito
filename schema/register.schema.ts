@@ -17,9 +17,12 @@ export const registerSchema: z.ZodType<RegisterFormProps> = z
       .min(2, { message: "Apellido demasiado corto (min. 2 caracteres)" })
       .max(50, { message: "Apellido demasiado largo (máx. 50 caracteres)" }),
 
-    dni: z.string().regex(/^[\d]{1,3}?[\d]{3,3}?([\d]{3,3})?$/, {
-      message: "DNI no valido (5-9 dígitos sin puntos)",
-    }),
+    dni: z
+    //TODO: Ver el error Expected string, received nan
+      .string()
+      .regex(/^[\d]{1,3}(?:[\d]{3})?(?:[\d]{3})?$/, {
+        message: "DNI no valido (5-9 dígitos, sin puntos y guiones)",
+      },),
 
     email: z.string().email({ message: "¡No olvides tu correo electrónico!" }),
 

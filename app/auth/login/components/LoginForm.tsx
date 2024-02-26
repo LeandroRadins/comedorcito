@@ -4,7 +4,7 @@ import { registerSchema } from "@/schema/index";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Label } from "@/app/components/Label";
+import { Label } from "@/app/components/FormField";
 import { FormHeader } from "@/app/auth/components/FormHeader";
 import { z } from "zod";
 
