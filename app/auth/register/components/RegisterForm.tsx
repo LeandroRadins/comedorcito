@@ -1,15 +1,12 @@
 "use client";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
-import { FormHeader } from "../../components/FormHeader";
-import { Label } from "../../../components/Label";
-import { registerSchema } from "@/schema";
-import { z } from "zod";
+import { registerSchema } from "@/schema/register.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-
-// TODO: armar los datos dinamicos para el manejo de datos desde front y back
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Label } from "../../../components/Label";
+import { FormHeader } from "../../components/FormHeader";
 
 const RegisterForm = () => {
   const {
@@ -18,9 +15,15 @@ const RegisterForm = () => {
     formState: { errors },
   } = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
+    defaultValues: {
+      name: "",
+      surname: "",
+      dni: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
   });
-
-  const [confirmation, setConfirmation] = useState(false);
 
   const router = useRouter();
 
@@ -32,23 +35,28 @@ const RegisterForm = () => {
   };
 
   const onsubmit = async (data: z.infer<typeof registerSchema>) => {
-    if (validateData(data)) {
-      const res = await fetch("/api/auth/register", {
-        headers: { "Content-Type": "application/json" },
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+    if (!validateData(data)) {
+      return;
+    }
 
-      if (res.ok) {
-        router.push("/auth/login");
-      } else {
-        const { message } = await res.json();
-        toast({
-          title: "Error inesperado",
-          description: message,
-          variant: "danger",
-        });
-      }
+    // Se elimina confirmPassword del objeto data
+    const { confirmPassword, ...rest } = data;
+
+    const res = await fetch("/api/auth/register", {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+      body: JSON.stringify(rest),
+    });
+
+    if (res.ok) {
+      router.push("/auth/login");
+    } else {
+      const { message } = await res.json();
+      toast({
+        title: "Error inesperado",
+        description: message,
+        variant: "danger",
+      });
     }
   };
 
@@ -65,7 +73,7 @@ const RegisterForm = () => {
                 <input
                   id="name"
                   type="text"
-                  placeholder=""
+                  placeholder="Cosme Fulanito"
                   {...register("name")}
                   className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 />

@@ -1,26 +1,27 @@
 import { z } from "zod";
+import { Prisma } from "@lib/db";
 
-export const registerSchema = z
+interface RegisterFormProps extends Prisma.UserCreateInput {
+  confirmPassword: string;
+}
+
+export const registerSchema: z.ZodType<RegisterFormProps> = z
   .object({
     name: z
-      .string({ required_error: "¡No olvides tu nombre!" })
+      .string()
       .min(2, { message: "Nombre demasiado corto (min. 2 caracteres)" })
-      .max(50, { message: "Nombre demasiado largo (máx. 50 caracteres)" })
-      .toUpperCase(),
+      .max(50, { message: "Nombre demasiado largo (máx. 50 caracteres)" }),
+
     surname: z
       .string()
       .min(2, { message: "Apellido demasiado corto (min. 2 caracteres)" })
-      .max(50, { message: "Apellido demasiado largo (máx. 50 caracteres)" })
-      .toUpperCase(),
+      .max(50, { message: "Apellido demasiado largo (máx. 50 caracteres)" }),
 
     dni: z.string().regex(/^[\d]{1,3}?[\d]{3,3}?([\d]{3,3})?$/, {
       message: "DNI no valido (5-9 dígitos sin puntos)",
     }),
 
-    email: z
-      .string()
-      .email({ message: "¡No olvides tu correo electrónico!" })
-      .toLowerCase(),
+    email: z.string().email({ message: "¡No olvides tu correo electrónico!" }),
 
     password: z
       .string()
@@ -32,8 +33,9 @@ export const registerSchema = z
       })
       .min(1, { message: "Confirme su contraseña" }),
   })
-  .refine((data) => data.password !== data.confirmPassword, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
   });
 
-export type UserModel = z.infer<typeof registerSchema>;
+export type RegisterInput = z.infer<typeof registerSchema>;

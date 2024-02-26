@@ -2,6 +2,8 @@ import db from "@lib/db";
 import { Prisma } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import { registerSchema } from "@/schema";
+import { z } from "zod";
 
 const hashPassword = async (password: string) => {
   const salt = await bcrypt.genSalt(10);
@@ -9,9 +11,28 @@ const hashPassword = async (password: string) => {
   return hashedPassword;
 };
 
+// TODO: Arreglar validacion de datos desde zod
+/* const validateData = (data: z.infer<typeof registerSchema>) => {
+  const isValid = registerSchema.safeParse(data);
+  return isValid.success;
+}; */
+
 export async function POST(request: Request) {
   try {
     const data = await request.json();
+
+    /*     console.log(data);
+
+    const validatedData = validateData(data);
+
+    console.log(validatedData);
+
+    if (!validatedData) {
+      return NextResponse.json(
+        { message: "Ocurrio un error en la validacion de los datos" },
+        { status: 400 }
+      );
+    } */
 
     const userFound = await db.user.findFirst({
       where: {
@@ -29,15 +50,20 @@ export async function POST(request: Request) {
       );
     } else {
       const hashedPassword = await hashPassword(data.password);
-      const newUser = await db.user.create({
-        data: {
-          dni: data.dni,
-          name: data.name,
-          surname: data.surname,
-          email: data.email,
-          password: hashedPassword,
-        },
-      });
+
+      const newUser = await db.user
+        .create({
+          data: {
+            dni: data.dni,
+            name: data.name,
+            surname: data.surname,
+            email: data.email,
+            password: hashedPassword,
+          },
+        })
+        .catch((error) => {
+          throw error;
+        });
 
       const { password: _, ...user } = newUser;
 
@@ -47,22 +73,9 @@ export async function POST(request: Request) {
       );
     }
   } catch (error) {
-    // TODO: armar tipado para diferentes errores
-    /*
-    type Error = {
-      message: string;
-      status: number;
-    }
-
-    Base de datos
-    Servidor
-    Validacion de datos
-
-    */
-
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return NextResponse.json(
-        { message: "Ocurrio un error en la base de datos", code: error.code },
+        { message: "Ocurrio un error inesperado", code: error.code },
         { status: 500 }
       );
     }
