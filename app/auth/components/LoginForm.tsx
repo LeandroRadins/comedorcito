@@ -4,12 +4,10 @@ import { loginSchema } from "@/schema/index";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { FormHeader } from "@/app/auth/components/FormHeader";
+import { PageHeader } from "@/app/components/PageHeader";
 import { z } from "zod";
 import FormField from "@/app/components/FormField";
 import Link from "next/link";
-
-// TODO: armar los datos dinamicos para el manejo de datos desde front y back
 
 const LoginForm = () => {
   const {
@@ -45,7 +43,16 @@ const LoginForm = () => {
   return (
     <>
       <div className="flex max-h-full flex-1 flex-col justify-center px-6 py-28 lg:px-8">
-        <FormHeader title="Iniciar sesión" />
+        <PageHeader
+          title="Iniciar sesión"
+          imageData={{
+            src: "/dinner.svg",
+            alt: "dinner",
+            width: 24,
+            height: 24,
+          }}
+          headerStyle="mx-auto text-center"
+        />
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-4" onSubmit={handleSubmit(onsubmit)}>

@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import FormField from "../../../components/FormField";
-import { FormHeader } from "../../components/FormHeader";
+import FormField from "../../components/FormField";
+import { PageHeader } from "../../components/PageHeader";
 import Link from "next/link";
 
 const RegisterForm = () => {
@@ -22,7 +22,6 @@ const RegisterForm = () => {
       dni: "",
       email: "",
       password: "",
-      confirmPassword: "",
     },
   });
 
@@ -40,13 +39,10 @@ const RegisterForm = () => {
       return;
     }
 
-    // Se elimina confirmPassword del objeto data
-    const { confirmPassword, ...rest } = data;
-
     const res = await fetch("/api/auth/register", {
       headers: { "Content-Type": "application/json" },
       method: "POST",
-      body: JSON.stringify(rest),
+      body: JSON.stringify(data),
     });
 
     if (res.ok) {
@@ -63,12 +59,20 @@ const RegisterForm = () => {
 
   return (
     <>
-      <div className="flex max-h-full flex-1 flex-col justify-center px-6 py-28 lg:px-8">
-        <FormHeader title="Registrarse" />
+      <div className="flex max-h-full flex-1 flex-col justify-center px-6 py-28 lg:px-8 border-2 border-orange-600">
+        <PageHeader
+          title="Registrarse"
+          imageData={{
+            src: "/dinner.svg",
+            alt: "dinner",
+            width: 24,
+            height: 24,
+          }}
+          headerStyle="mx-auto text-center"
+        />
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-4" onSubmit={handleSubmit(onsubmit)}>
-
             <div>
               <FormField
                 labelName="Nombre"
@@ -121,17 +125,6 @@ const RegisterForm = () => {
                 placeholder="********"
                 register={register}
                 error={errors.password}
-              />
-            </div>
-
-            <div>
-              <FormField
-                labelName="Confirmar contraseña"
-                name="confirmPassword"
-                type="password"
-                placeholder="********"
-                register={register}
-                error={errors.confirmPassword}
               />
             </div>
 
