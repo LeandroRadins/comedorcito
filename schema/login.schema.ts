@@ -10,4 +10,4 @@ export const loginSchema: z.ZodType<LoginFormProps> = z.object({
     .min(8, { message: "Contraseña demasiado corta (min. 8 caracteres)" }),
 });
 
-export type LoginInput = z.infer<typeof loginSchema>;
+export type loginSchema = z.infer<typeof loginSchema>;

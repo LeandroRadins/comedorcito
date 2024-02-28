@@ -1,12 +1,13 @@
 "use client";
 import { useToast } from "@/components/ui/use-toast";
-import { registerSchema } from "@/schema/index";
+import { loginSchema } from "@/schema/index";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { Label } from "@/app/components/FormField";
 import { FormHeader } from "@/app/auth/components/FormHeader";
 import { z } from "zod";
+import FormField from "@/app/components/FormField";
+import Link from "next/link";
 
 // TODO: armar los datos dinamicos para el manejo de datos desde front y back
 
@@ -15,18 +16,30 @@ const LoginForm = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<z.infer<typeof registerSchema>>();
+  } = useForm<z.infer<typeof loginSchema>>();
 
   const router = useRouter();
 
   const { toast } = useToast();
 
-  const onsubmit = async (data: z.infer<typeof registerSchema>) => {
+  const onsubmit = async (data: z.infer<typeof loginSchema>) => {
     const res = await signIn("credentials", {
       email: data.email,
       password: data.password,
+      redirect: false,
     });
-    console.log(res);
+
+    if (res?.error) {
+      toast({
+        title: "Error de inicio de sesión",
+        description:
+          "Por favor, verifique sus credenciales e intente nuevamente.",
+        variant: "danger",
+      });
+      return;
+    } else {
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -37,46 +50,25 @@ const LoginForm = () => {
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-4" onSubmit={handleSubmit(onsubmit)}>
             <div>
-              <Label htmlFor="email">Correo Electrónico</Label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  type="email"
-                  {...register("email", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides tu correo electrónico! ✍️",
-                    },
-                  })}
-                  className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-                {errors.email && (
-                  <span className="text-red-600">{errors.email.message}</span>
-                )}
-              </div>
+              <FormField
+                labelName="Correo Electrónico"
+                type="email"
+                name="email"
+                placeholder="email@email.com"
+                register={register}
+                error={errors.email}
+              />
             </div>
 
             <div>
-              <Label htmlFor="password">Contraseña</Label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  type="password"
-                  {...register("password", {
-                    required: {
-                      value: true,
-                      message: "¡No olvides ingresar una contraseña! ✍️",
-                    },
-                  })}
-                  autoComplete="current-password"
-                  className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                />
-                {errors.password && (
-                  <span className="text-red-600">
-                    {errors.password.message}
-                  </span>
-                )}
-              </div>
+              <FormField
+                labelName="Contraseña"
+                type="password"
+                name="password"
+                placeholder="***********"
+                register={register}
+                error={errors.email}
+              />
             </div>
 
             <div>
@@ -91,12 +83,12 @@ const LoginForm = () => {
 
           <p className="mt-10 text-center text-sm text-gray-500">
             ¿Todavía no tenés una cuenta?{" "}
-            <a
-              href="#"
+            <Link
+              href="/auth/register"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
-              Registrate acá puto, no seas gato loco
-            </a>
+              Registrate acá
+            </Link>
           </p>
         </div>
       </div>

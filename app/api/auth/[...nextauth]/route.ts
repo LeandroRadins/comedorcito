@@ -26,16 +26,14 @@ const credentialsOptions = {
               email: credentials.email,
             },
           });
-          if (!userFound) throw new Error("No se encontró el usuario");
-
-          console.log(userFound);
+          if (!userFound) throw new Error("user not found");
 
           const matchPassword = await bcrypt.compare(
             credentials.password,
             userFound.password
           );
 
-          if (!matchPassword) throw new Error("Contraseña incorrecta");
+          if (!matchPassword) throw new Error("password not match");
 
           if (userFound) {
             return {

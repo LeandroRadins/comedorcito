@@ -1,6 +1,6 @@
 import { FormFieldProps } from "@/lib/types";
 
-export const FormField: React.FC<FormFieldProps> = ({
+export const FormField: React.FC<FormFieldProps<any>> = ({
   labelName,
   type,
   placeholder,
@@ -11,7 +11,7 @@ export const FormField: React.FC<FormFieldProps> = ({
 }) => (
   <>
     <label
-      htmlFor={name}
+      htmlFor={String(name)}
       className="block text-1xl font-medium leading-6 text-gray-900"
     >
       {labelName}
@@ -19,7 +19,7 @@ export const FormField: React.FC<FormFieldProps> = ({
     <input
       type={type}
       placeholder={placeholder}
-      {...register(name, { valueAsNumber })}
+      {...register(String(name), { valueAsNumber })}
       className="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mt-1"
     />
     {error && <span className="text-red-600">{error.message}</span>}

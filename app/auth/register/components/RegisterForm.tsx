@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import FormField from "../../../components/FormField";
 import { FormHeader } from "../../components/FormHeader";
+import Link from "next/link";
 
 const RegisterForm = () => {
   const {
@@ -63,11 +64,11 @@ const RegisterForm = () => {
   return (
     <>
       <div className="flex max-h-full flex-1 flex-col justify-center px-6 py-28 lg:px-8">
-        
         <FormHeader title="Registrarse" />
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
           <form className="space-y-4" onSubmit={handleSubmit(onsubmit)}>
+
             <div>
               <FormField
                 labelName="Nombre"
@@ -98,7 +99,6 @@ const RegisterForm = () => {
                 placeholder="12345678"
                 register={register}
                 error={errors.dni}
-                valueAsNumber
               />
             </div>
 
@@ -134,7 +134,7 @@ const RegisterForm = () => {
                 error={errors.confirmPassword}
               />
             </div>
-          
+
             <div>
               <button
                 type="submit"
@@ -147,12 +147,12 @@ const RegisterForm = () => {
 
           <p className="mt-10 text-center text-sm text-gray-500">
             ¿Ya tienes una cuenta?{" "}
-            <a
-              href="#"
+            <Link
+              href="/auth/login"
               className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
             >
               Inicia sesión
-            </a>
+            </Link>
           </p>
         </div>
       </div>

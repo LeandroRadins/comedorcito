@@ -18,11 +18,11 @@ export const registerSchema: z.ZodType<RegisterFormProps> = z
       .max(50, { message: "Apellido demasiado largo (máx. 50 caracteres)" }),
 
     dni: z
-    //TODO: Ver el error Expected string, received nan
+      //TODO: Ver el error Expected string, received nan
       .string()
       .regex(/^[\d]{1,3}(?:[\d]{3})?(?:[\d]{3})?$/, {
         message: "DNI no valido (5-9 dígitos, sin puntos y guiones)",
-      },),
+      }),
 
     email: z.string().email({ message: "¡No olvides tu correo electrónico!" }),
 

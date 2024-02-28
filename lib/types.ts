@@ -1,13 +1,12 @@
-import { FieldError, UseFormRegister } from "react-hook-form";
-import { z } from "zod";
-import { registerSchema } from "@/schema/register.schema";
+import { FieldError, UseFormRegister, FieldValues } from "react-hook-form";
 
-export type FormFieldProps = {
+export type FormFieldProps<T extends FieldValues> = {
     labelName: string;
     type: string;
     placeholder: string;
-    name: keyof z.infer<typeof registerSchema>;
-    register: UseFormRegister<z.infer<typeof registerSchema>>;
+    name: keyof T;
+    register: UseFormRegister<T>;
     error: FieldError | undefined;
     valueAsNumber?: boolean;
+    props?: any;
 };
