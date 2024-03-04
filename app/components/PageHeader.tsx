@@ -20,7 +20,6 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 }) => {
   return (
     <>
-      {/*TODO: Agregar img de nexts */}
       <Image
         className={`my-auto size-10 ${imageStyle}`}
         src={imageData.src}

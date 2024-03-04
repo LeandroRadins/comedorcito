@@ -16,7 +16,6 @@ export const registerSchema: z.ZodType<Prisma.UserCreateInput> = z
       .toUpperCase(),
 
     dni: z
-      //TODO: Ver el error Expected string, received nan
       .string()
       .regex(/^[\d]{1,3}(?:[\d]{3})?(?:[\d]{3})?$/, {
         message: "DNI no valido (5-9 dígitos, sin puntos y guiones)",
