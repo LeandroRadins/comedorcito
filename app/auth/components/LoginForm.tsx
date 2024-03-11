@@ -20,6 +20,23 @@ const LoginForm = () => {
 
   const { toast } = useToast();
 
+  const iniciarConDiscord = async (data: z.infer<typeof loginSchema>) => {
+    const res = await signIn("discord", {
+    });
+
+    if (res?.error) {
+      toast({
+        title: "Error de inicio de sesión",
+        description:
+          "Por favor, verifique sus credenciales e intente nuevamente.",
+        variant: "danger",
+      });
+      return;
+    } else {
+      router.push("/dashboard");
+    }
+  };
+
   const onsubmit = async (data: z.infer<typeof loginSchema>) => {
     const res = await signIn("credentials", {
       email: data.email,
@@ -87,6 +104,12 @@ const LoginForm = () => {
               </button>
             </div>
           </form>
+          <button
+                onClick={() => signIn("discord")}
+                className="flex w-full justify-center rounded-md mt-8 bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Iniciar sesión con Discord
+              </button>
 
           <p className="mt-10 text-center text-sm text-gray-500">
             ¿Todavía no tenés una cuenta?{" "}

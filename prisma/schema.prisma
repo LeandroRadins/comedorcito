@@ -10,6 +10,41 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
 model User {
   id       String @id @default(uuid())
   dni      String @unique
@@ -19,36 +54,8 @@ model User {
   password String
   createdAt DateTime @default(now()) @db.Timestamptz() @map("created_at")
   updatedAt DateTime @updatedAt @db.Timestamptz() @map("updated_at")
-  roles   Role[]
-}
-
-model Role {
-  id   String @id @default(uuid())
-  name String
-  createdAt DateTime @default(now()) @db.Timestamptz() @map("created_at")
-  updatedAt DateTime @updatedAt @db.Timestamptz() @map("updated_at")
-  user User @relation(fields: [userId], references: [id])
-  userId String @map("user_id")
-  roles PermissionsOnRoles[]
-}
-
-model Permission {
-  id   String @id @default(uuid())
-  name String
-  createdAt DateTime @default(now()) @db.Timestamptz() @map("created_at")
-  updatedAt DateTime @updatedAt @db.Timestamptz() @map("updated_at")
-  roles PermissionsOnRoles[]
-}
-
-model PermissionsOnRoles {
-  role        Role       @relation(fields: [roleId], references: [id])
-  roleId      String @map("role_id")
-  permission  Permission @relation(fields: [permissionId], references: [id])
-  permissionId String @map("permission_id")
-  assignedBy  String @map("assigned_by")
-  assignedAt DateTime @default(now()) @db.Timestamptz() @map("assigned_at")
-  updatedAt DateTime @updatedAt @db.Timestamptz() @map("updated_at")
-  @@id([roleId, permissionId])
+  accounts      Account[]
+  sessions      Session[]
 }
 
 

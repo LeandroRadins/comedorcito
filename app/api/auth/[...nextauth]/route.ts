@@ -1,57 +1,41 @@
-import NextAuth from "next-auth";
+/* import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import db from "@lib/db";
 import * as bcrypt from "bcryptjs";
+import { JWT } from "next-auth/jwt";
+import { User } from "@prisma/client";
 
 const credentialsOptions = {
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        email: {
-          label: "Email",
-          type: "email",
-          placeholder: "email@email.com",
-        },
-        password: {
-          label: "Contraseña",
-          type: "password",
-          placeholder: "**********",
-        },
-      },
-      async authorize(credentials) {
-        if (credentials) {
-          const userFound = await db.user.findUnique({
-            where: {
-              email: credentials.email,
-            },
-          });
-          if (!userFound) throw new Error("user not found");
-
-          const matchPassword = await bcrypt.compare(
-            credentials.password,
-            userFound.password
-          );
-
-          if (!matchPassword) throw new Error("password not match");
-
-          if (userFound) {
-            return {
-              id: userFound.id,
-              name: userFound.name,
-              email: userFound.email,
-            };
-          }
-        }
-        return null;
-      },
-    }),
+    
   ],
   pages: {
     signIn: "/auth/login",
+  },
+  callbacks: {
+    async jwt({token, user}: {token: JWT; user: User} ) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+      }
+      return token;
+    },
+    async session({session, token}: {session: any; token: JWT}) {
+      session.user.id = token.id;
+      session.user.name = token.name;
+      session.user.email = token.email;
+      return session;
+    },
   },
 };
 
 const handler = NextAuth(credentialsOptions);
 
+export { handler as GET, handler as POST }; */
+
+import NextAuth from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };

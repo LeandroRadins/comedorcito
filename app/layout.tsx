@@ -5,6 +5,7 @@ import "./globals.css";
 //Shadcn imports
 import { Toaster } from "@/components/ui/toaster";
 import NavBar from "./components/NavBar";
+import AuthProvider from "./context/AuthProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,10 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-primary/20`}>
-        <main>
-          <NavBar />
-          {children}
-        </main>
+        <AuthProvider>
+          <main>
+            <NavBar />
+            {children}
+          </main>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

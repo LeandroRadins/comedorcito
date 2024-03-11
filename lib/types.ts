@@ -10,3 +10,8 @@ export type FormFieldProps<T extends FieldValues> = {
     valueAsNumber?: boolean;
     props?: any;
 };
+
+export type PermissionObject = {
+    name: string;
+    path: string[];
+};
